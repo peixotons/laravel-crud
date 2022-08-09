@@ -11,9 +11,12 @@ class SeriesController extends Controller
     public function index(Request $request) 
     {
         
-        $series = Serie::query()->orderBy('nome')->get();        
+        $series = Serie::query()->orderBy('nome')->get();
+        $mensagemSucesso = $request->session()->get('mensagem.sucesso'); 
+        // $request->session()->forget('mensagem.sucesso'); Desnecessário pois estou usando o FLASH em vez do PUT
         
-        return view('series.index', compact('series'));
+        return view('series.index')->with('series', $series)
+        ->with('mensagemSucesso', $mensagemSucesso);
     }
 
     public function create () 
@@ -32,7 +35,9 @@ class SeriesController extends Controller
 
     public function destroy (Request $request) 
     {
-        Serie::destroy($request->serie);
+        
+        Serie::destroy($request->series);
+        $request->session()->flash('mensagem.sucesso', 'Série removida com sucesso');
         
         return redirect()->route('series.index');
 
