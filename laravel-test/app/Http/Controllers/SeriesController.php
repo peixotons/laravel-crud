@@ -12,32 +12,33 @@ class SeriesController extends Controller
     {
         
         $series = Serie::query()->orderBy('nome')->get();
-        $mensagemSucesso = $request->session()->get('mensagem.sucesso'); 
-        // $request->session()->forget('mensagem.sucesso'); Desnecessário pois estou usando o FLASH em vez do PUT
-        
+       
+        $mensagemSucesso = session('mensagem.sucesso'); 
+            
         return view('series.index')->with('series', $series)
         ->with('mensagemSucesso', $mensagemSucesso);
     }
 
-    public function create () 
+    public function create (Request $request) 
     {
         return view ('series.create');
+        
     }
 
     public function store(Request $request)
     {
         
-        Serie::create($request->all());
-       
+        $serie = Serie::create($request->all());        
+        $request->session()->flash('mensagem.sucesso', "Série '{$serie->nome}' adicionada com sucesso");
         return redirect()->route('series.index');   
 
     }
 
-    public function destroy (Request $request) 
+    public function destroy (Serie $series, Request $request) 
     {
         
-        Serie::destroy($request->series);
-        $request->session()->flash('mensagem.sucesso', 'Série removida com sucesso');
+        $series->delete();
+        $request->session()->flash('mensagem.sucesso', "Série '{$series->nome}' removida com sucesso");
         
         return redirect()->route('series.index');
 
